@@ -4,9 +4,9 @@ before_script:
   - gem install rake
 deploy:
   provider: s3
-  access_key_id: $AWS_ACCESS_KEY_ID
-  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  access-key-id: $AWS_ACCESS_KEY_ID
+  secret-access-key: $AWS_SECRET_ACCESS_KEY
   bucket: $AWS_BUCKET_NAME
-  skip_cleanup: true
+  skip-cleanup: true
   region: $AWS_REGION
   acl: public_read

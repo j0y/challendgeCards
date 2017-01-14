@@ -5,8 +5,8 @@ provider "aws" {
 }
 
 # Here we specify the bucket
-resource "aws_s3_bucket" "prod_bucket" {
-    bucket = "${var.prod_bucket_name}"
+resource "aws_s3_bucket" "bucket" {
+    bucket = "${var.bucket_name}"
     acl = "public-read"
 
     cors_rule {
@@ -24,10 +24,10 @@ resource "aws_s3_bucket" "prod_bucket" {
 }
 
 # Create Cloudfront distribution
-resource "aws_cloudfront_distribution" "prod_distribution" {
+resource "aws_cloudfront_distribution" "distribution" {
     origin {
-        domain_name = "${aws_s3_bucket.prod_bucket.id}.s3-website-${var.aws_region}.amazonaws.com"
-        origin_id   = "${aws_s3_bucket.prod_bucket.id}"
+        domain_name = "${aws_s3_bucket.bucket.id}.s3-website-${var.aws_region}.amazonaws.com"
+        origin_id   = "${aws_s3_bucket.bucket.id}"
  
         custom_origin_config {
             http_port = 80
@@ -51,7 +51,7 @@ resource "aws_cloudfront_distribution" "prod_distribution" {
     default_cache_behavior {
         allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
         cached_methods = ["GET", "HEAD"]
-        target_origin_id = "${aws_s3_bucket.prod_bucket.id}"
+        target_origin_id = "${aws_s3_bucket.bucket.id}"
 
         # Forward all query strings, cookies and headers
         forwarded_values {

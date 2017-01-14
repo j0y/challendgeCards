@@ -1,5 +1,6 @@
-lang: python
-before_deploy:
-  pip install --user awscli
+language: python
+cache: pip
+install:
+  - pip install awscli
 deploy:
   aws s3 sync s3://${AWS_BUCKET_NAME}/ ./ --acl public-read

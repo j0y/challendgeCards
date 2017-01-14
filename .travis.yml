@@ -1,9 +1,7 @@
 language: python
 cache: pip
-before_deploy:
+install:
   - pip install --user awscli
   - export PATH=$PATH:$HOME/.local/bin
-deploy:
-  provider: script
-  script: aws s3 sync ./ s3://${AWS_BUCKET_NAME}/ --acl public-read --delete
-  skip_cleanup: true
+script:
+  - aws s3 sync ./ s3://${AWS_BUCKET_NAME}/ --acl public-read --delete

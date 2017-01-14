@@ -3,4 +3,4 @@ cache: pip
 install:
   - pip install awscli
 deploy:
-  aws s3 sync s3://${AWS_BUCKET_NAME}/ ./ --acl public-read
+  aws s3 sync ./ s3://${AWS_BUCKET_NAME}/ --acl public-read --delete

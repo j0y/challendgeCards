@@ -1,7 +1,6 @@
 language: python
 cache: pip
 install:
-  - pip install --user awscli
-  - export PATH=$PATH:$HOME/.local/bin
+  - pip install awscli
 script:
   - aws s3 sync ./ s3://${AWS_BUCKET_NAME}/ --acl public-read --delete

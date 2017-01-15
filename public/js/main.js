@@ -3,7 +3,8 @@
  */
 var app = angular.module('WebApp', [
   'ngRoute',
-  'uiGmapgoogle-maps'
+  'uiGmapgoogle-maps',
+  'firebase'
 ]);
 
 app.config(function(uiGmapGoogleMapApiProvider) {
@@ -31,13 +32,18 @@ app.config(['$routeProvider', function ($routeProvider) {
 /**
  * Controls the card checkining
  */
-app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi) {
+app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObject) {
   console.log("Checkin Controller reporting for duty.");
 
+  var ref = firebase.database().ref();
+
   $scope.checkin = function() {
-      console.log($scope.trackID);
-      console.log($scope.comment);
-      console.log($scope.map.marker);
+    console.log($scope.trackID);
+    console.log($scope.comment);
+    console.log($scope.map.marker);
+    $scope.data = $firebaseObject(ref.child($scope.trackID));
+    console.log($scope.data);
+
   };
 
   //set initial marker value
@@ -75,8 +81,44 @@ app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi) {
 /**
  * Controls the card creation
  */
-app.controller('CreateCtrl', function (/* $scope, $location, $http */) {
+app.controller('CreateCtrl', function ($scope, $firebaseObject) {
   console.log("Create Controller reporting for duty.");
+
+  var ref = firebase.database().ref();
+
+  $scope.getID = function() {
+  
+  var unique = false;
+  var i = 0;
+    do {
+      i++;
+      var randomUid = (0|Math.random()*9e6).toString(36);
+      unique = checkIfIDExists(randomUid);
+      if (unique) {
+        break;
+      }
+      console.log(randomUid + " - " + unique);
+
+      }
+    while (i<10);
+
+    newUid = randomUid;
+
+    newRef = firebase.database().ref(newUid).set({
+      created: Date.now()
+    });
+
+    $scope.uid = newUid;
+    console.log(newRef.key);
+  };
+
+  function checkIfIDExists(uid) {
+  var Ref = firebase.database().ref();
+  Ref.child(uid).once('value', function(snapshot) {
+    return snapshot.exists();
+  });
+}
+  
 });
 
 /**

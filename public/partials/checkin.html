@@ -1,0 +1,23 @@
+<section >
+  <div class="container">
+    <div class="row">
+        <h2>Track</h2>
+
+        <p>Найди где побывала эта карта до тебя.</p>
+
+          <div class="form-group">
+            <label>CARD ID:</label>
+            <input type="text" class="form-control" ng-model="trackID">
+            <label>Коментарий:</label>
+            <input type="text" class="form-control" ng-model="comment">
+            <label>Место</label>
+            <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true" events="map.events">
+                <ui-gmap-marker coords="map.marker.coords" icon="map.marker.icon" idkey="map.marker.id"></ui-gmap-marker>
+            </ui-gmap-google-map>
+
+            <button ng-click="checkin()" type="submit" class="btn btn-primary">Отметиться</button>
+          </div>
+    </div>
+
+  </div>
+</section>

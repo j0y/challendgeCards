@@ -24,6 +24,7 @@ app.config(['$routeProvider', function ($routeProvider) {
     .when("/", {templateUrl: "partials/home.html", controller: "HomeCtrl"})
     // Pages
     .when("/checkin", {templateUrl: "partials/checkin.html", controller: "CheckinCtrl"})
+    .when("/track", {templateUrl: "partials/track.html", controller: "TrackinCtrl"})
     .when("/create", {templateUrl: "partials/create.html", controller: "CreateCtrl"})
     // else 404
     .otherwise("/404", {templateUrl: "partials/404.html"});
@@ -41,8 +42,15 @@ app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
     console.log($scope.trackID);
     console.log($scope.comment);
     console.log($scope.map.marker);
-    $scope.data = $firebaseObject(ref.child($scope.trackID));
-    console.log($scope.data);
+
+    var comment = {"comment":$scope.comment};
+    var myDest = {}  ;
+
+    angular.extend(myDest, $scope.map.marker, comment )
+
+    var newRef = ref.child($scope.trackID + "/pings").push({
+        location: myDest,
+      });
 
   };
 
@@ -79,6 +87,72 @@ app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
 });
 
 /**
+ * Controls the card trackining
+ */
+app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObject, $timeout) {
+  console.log("Trackin Controller reporting for duty.");
+
+  var ref = firebase.database().ref();
+  
+
+  $scope.track = function() {
+    $scope.map.markers = [];
+    console.log($scope.trackID);
+    firebase.database().ref($scope.trackID).once('value').then(function(snapshot) {
+    var card = snapshot.val();
+    console.log(card);
+
+    var query = firebase.database().ref($scope.trackID + "/pings").orderByKey();
+    query.once("value")
+      .then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var location = childSnapshot.child("location").val();
+          $scope.map.markers.push(location);
+        });
+      });
+    });
+    console.log($scope.map.markers);
+
+    //$scope.map.control.refresh();
+
+    var bounds = new google.maps.LatLngBounds();
+    for (var i=0; i<$scope.map.markers.length; i++) {
+      var latlng = new google.maps.LatLng($scope.map.markers[i]["coords"]["latitude"], $scope.positions[i]["coords"]["longitude"]);
+      bounds.extend(latlng);
+    }
+    
+    $scope.$watch($scope.map.mapControl, function(){
+      $scope.map.mapControl.getGMap().fitBounds(bounds);
+    });
+   
+
+    $timeout(function() {
+        $scope.map.mapControl.getGMap().fitBounds(bounds);
+    }, 100);
+    $scope.map.show = true;
+  };
+
+  //set initial marker value
+  uiGmapGoogleMapApi.then(function(maps) {
+    $scope.map.markers = [];
+    $scope.map.control = {};
+  });
+  
+  angular.extend($scope, {
+        map: {
+            center: {
+                latitude: 55.3435941,
+                longitude: 86.0614013
+            },
+            zoom: 11,
+            streetViewControl: false,
+            bounds: {},
+            mapControl: {}
+        }
+      });
+});
+
+/**
  * Controls the card creation
  */
 app.controller('CreateCtrl', function ($scope, $firebaseObject) {
@@ -104,11 +178,11 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
 
     newUid = randomUid;
 
-    newRef = firebase.database().ref(newUid).set({
-      created: Date.now()
-    });
-
-    $scope.uid = newUid;
+    var newRef = ref.push({
+        uid: newUid,
+        created: Date.now()
+      });
+    $scope.uid = newRef.key;
     console.log(newRef.key);
   };
 

@@ -100,7 +100,6 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
     console.log($scope.trackID);
     firebase.database().ref($scope.trackID).once('value').then(function(snapshot) {
     var card = snapshot.val();
-    console.log(card);
 
     var query = firebase.database().ref($scope.trackID + "/pings").orderByKey();
     query.once("value")
@@ -111,25 +110,19 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
         });
       });
     });
-    console.log($scope.map.markers);
 
     //$scope.map.control.refresh();
 
     var bounds = new google.maps.LatLngBounds();
     for (var i=0; i<$scope.map.markers.length; i++) {
-      var latlng = new google.maps.LatLng($scope.map.markers[i]["coords"]["latitude"], $scope.positions[i]["coords"]["longitude"]);
+      var latlng = new google.maps.LatLng($scope.map.markers[i].coords.latitude, $scope.positions[i].coords.longitude);
       bounds.extend(latlng);
     }
+    console.log($scope.map.markers);
     
     $scope.$watch($scope.map.mapControl, function(){
       $scope.map.mapControl.getGMap().fitBounds(bounds);
     });
-   
-
-    $timeout(function() {
-        $scope.map.mapControl.getGMap().fitBounds(bounds);
-    }, 100);
-    $scope.map.show = true;
   };
 
   //set initial marker value
@@ -192,8 +185,67 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
     return snapshot.exists();
   });
 }
+
+function downloadCanvas(link, canvasId, filename) {
+    link.href = document.getElementById(canvasId).toDataURL();
+    link.download = filename;
+};
   
 });
+
+app.directive('card', function () {
+      return {
+        restrict: 'EA',
+        template:'<canvas></canvas>',
+        replace:true,
+        link: function (scope, el, attrs) {
+
+          scope.upperText = "";
+          scope.fontsize = 30;
+          var c = el[0];   
+            c.height = 400;
+          var ctx = c.getContext("2d");
+           
+ 
+          scope.drawCanvas = function () {
+
+            c.width = c.width;
+            ctx.font = scope.fontsize + "px  Impact";
+            //ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            var x = c.width / 2;
+            var y = c.height / 3;
+            ctx.textAlign = 'center';
+            ctx.fillText(scope.upperText, x, y);
+            //ctx.lineWidth = 2;
+            //ctx.strokeText(scope.upperText, x, y);
+
+            ctx.lineWidth = 5;
+
+            ctx.strokeStyle = '#000000';
+            ctx.strokeRect(10, 10, 259, 387);
+
+            ctx.lineWidth = 11;
+
+            ctx.strokeStyle = '#000000';
+            ctx.beginPath();
+            ctx.moveTo(10, 100);
+            ctx.lineTo(270, 100);
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.strokeStyle = '#000000';
+            ctx.beginPath();
+            ctx.moveTo(10, 300);
+            ctx.lineTo(270, 300);
+            ctx.stroke();
+            ctx.closePath();
+
+            
+          };
+        }
+      }
+    });
 
 /**
  * Controls all other Pages

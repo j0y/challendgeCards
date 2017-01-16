@@ -33,24 +33,23 @@ app.config(['$routeProvider', function ($routeProvider) {
 /**
  * Controls the card checkining
  */
-app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObject) {
+app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObject, $location) {
   console.log("Checkin Controller reporting for duty.");
 
   var ref = firebase.database().ref();
 
   $scope.checkin = function() {
-    console.log($scope.trackID);
-    console.log($scope.comment);
-    console.log($scope.map.marker);
 
     var comment = {"comment":$scope.comment};
-    var myDest = {}  ;
+    var myDest = {};
 
     angular.extend(myDest, $scope.map.marker, comment )
 
     var newRef = ref.child($scope.trackID + "/pings").push({
         location: myDest,
       });
+
+    $location.path('/track');
 
   };
 
@@ -81,7 +80,7 @@ app.controller('CheckinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
                 $scope.map.marker = marker;
                 $scope.$apply();
             }
-        }
+            }
         }
       });
 });
@@ -97,7 +96,6 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
 
   $scope.track = function() {
     $scope.map.markers = [];
-    console.log($scope.trackID);
     firebase.database().ref($scope.trackID).once('value').then(function(snapshot) {
     var card = snapshot.val();
 
@@ -110,25 +108,12 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
         });
       });
     });
-
-    //$scope.map.control.refresh();
-
-    var bounds = new google.maps.LatLngBounds();
-    for (var i=0; i<$scope.map.markers.length; i++) {
-      var latlng = new google.maps.LatLng($scope.map.markers[i].coords.latitude, $scope.positions[i].coords.longitude);
-      bounds.extend(latlng);
-    }
-    console.log($scope.map.markers);
-    
-    $scope.$watch($scope.map.mapControl, function(){
-      $scope.map.mapControl.getGMap().fitBounds(bounds);
-    });
+    $scope.map.mapControl.refresh();
   };
 
   //set initial marker value
   uiGmapGoogleMapApi.then(function(maps) {
     $scope.map.markers = [];
-    $scope.map.control = {};
   });
   
   angular.extend($scope, {
@@ -152,44 +137,19 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
   console.log("Create Controller reporting for duty.");
 
   var ref = firebase.database().ref();
+  $scope.uid = "";
 
   $scope.getID = function() {
-  
-  var unique = false;
-  var i = 0;
-    do {
-      i++;
-      var randomUid = (0|Math.random()*9e6).toString(36);
-      unique = checkIfIDExists(randomUid);
-      if (unique) {
-        break;
-      }
-      console.log(randomUid + " - " + unique);
 
-      }
-    while (i<10);
-
-    newUid = randomUid;
+    newUid = (0|Math.random()*9e6).toString(36);
 
     var newRef = ref.push({
         uid: newUid,
         created: Date.now()
       });
     $scope.uid = newRef.key;
-    console.log(newRef.key);
   };
 
-  function checkIfIDExists(uid) {
-  var Ref = firebase.database().ref();
-  Ref.child(uid).once('value', function(snapshot) {
-    return snapshot.exists();
-  });
-}
-
-function downloadCanvas(link, canvasId, filename) {
-    link.href = document.getElementById(canvasId).toDataURL();
-    link.download = filename;
-};
   
 });
 
@@ -241,7 +201,11 @@ app.directive('card', function () {
             ctx.stroke();
             ctx.closePath();
 
-            
+            var x = 20;
+            var y = c.height - 50;
+            ctx.font = "15px  Impact";
+            ctx.textAlign = 'left';
+            ctx.fillText("ID:" + scope.uid, x, y);
           };
         }
       }

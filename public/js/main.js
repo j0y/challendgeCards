@@ -97,23 +97,29 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
   $scope.track = function() {
     $scope.map.markers = [];
     firebase.database().ref($scope.trackID).once('value').then(function(snapshot) {
-    var card = snapshot.val();
-
-    var query = firebase.database().ref($scope.trackID + "/pings").orderByKey();
-    query.once("value")
-      .then(function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-          var location = childSnapshot.child("location").val();
-          $scope.map.markers.push(location);
+      var query = firebase.database().ref($scope.trackID + "/pings").orderByKey();
+      query.once("value")
+        .then(function(snapshot) {
+          snapshot.forEach(function(childSnapshot) {
+            var location = childSnapshot.child("location").val();
+            $scope.map.markers.push(location);
+            $scope.map.polyline.push(location.coords)
+          });
         });
-      });
     });
+
+    console.log($scope.map.markers);
+
+      console.log($scope.map.polyline);
+
+    $('#mapdiv').removeClass("hidden");
     $scope.map.mapControl.refresh();
   };
 
   //set initial marker value
   uiGmapGoogleMapApi.then(function(maps) {
     $scope.map.markers = [];
+    $scope.map.polyline = [];
   });
   
   angular.extend($scope, {
@@ -125,7 +131,8 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
             zoom: 11,
             streetViewControl: false,
             bounds: {},
-            mapControl: {}
+            mapControl: {},
+            polyline: []
         }
       });
 });

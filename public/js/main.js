@@ -103,18 +103,36 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
           snapshot.forEach(function(childSnapshot) {
             var location = childSnapshot.child("location").val();
             $scope.map.markers.push(location);
-            $scope.map.polyline.push(location.coords)
           });
+          $scope.makeLines();
+          $('#mapdiv').removeClass("hidden");
+          $scope.map.mapControl.refresh();
         });
     });
-
-    console.log($scope.map.markers);
-
-      console.log($scope.map.polyline);
-
-    $('#mapdiv').removeClass("hidden");
-    $scope.map.mapControl.refresh();
   };
+
+  $scope.makeLines = function() {
+    for (i = 0; i < $scope.map.markers.length - 1; i++) {
+      $scope.map.polyline.push(
+            {
+              id: i,
+              path: [],
+              stroke: {
+                  color: '#6060FB',
+                  weight: 3
+              },
+              geodesic: false,
+              visible: true,
+              icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.BACKWARD_OPEN_ARROW
+                },
+                offset: '2px'
+              }]
+            });
+      $scope.map.polyline[i].path.push($scope.map.markers[i].coords,$scope.map.markers[i+1].coords);
+    }
+  }
 
   //set initial marker value
   uiGmapGoogleMapApi.then(function(maps) {
@@ -132,7 +150,6 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
             streetViewControl: false,
             bounds: {},
             mapControl: {},
-            polyline: []
         }
       });
 });

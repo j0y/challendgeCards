@@ -14,7 +14,7 @@
             <label>Места</label>
             <ui-gmap-google-map control="map.mapControl" center="map.center" zoom="map.zoom" draggable="true" events="map.events">
                 <ui-gmap-markers fit="true" coords="'coords'" models="map.markers"></ui-gmap-markers>
-                 <ui-gmap-polyline path="map.polyline"></ui-gmap-polyline>
+                 <ui-gmap-polylines models="map.polyline" path="'path'" icons="'icons'"  fit="true"></ui-gmap-polylines>
             </ui-gmap-google-map>
             <div ng-repeat="m in map.markers">{{m.id  | date:'yyyy-MM-dd HH:mm'}} - {{m.comment}} </div>
           </div>

@@ -146,14 +146,38 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
   $scope.uid = "";
 
   $scope.getID = function() {
+    newUid = "450pf";
+    checkID(newUid);
+  };
 
-    newUid = (0|Math.random()*9e6).toString(36);
+    checkID = function(newUid) {
+      firebase.database().ref().once('value', function(snapshot) {
+      if (snapshot.hasChild(newUid)) {
+        console.log("exist");
+        generateNewId();
+      }
+      else {
+        console.log("display " + newUid);
+        displayId(newUid);
+      }
+    });
+    }
 
+
+  displayId = function(newUid){
     var newRef = firebase.database().ref(newUid).set({
         created: Date.now()
       });
     $scope.uid = newUid;
+    $scope.$apply();
+    $scope.drawCanvas();
   };
+
+  generateNewId = function() {
+    console.log("generator");
+    newUid = (0|Math.random()*9e6).toString(36);
+    checkID(newUid);
+  }
 
   
 });

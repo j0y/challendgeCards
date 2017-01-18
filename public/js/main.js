@@ -143,18 +143,16 @@ app.controller('TrackinCtrl', function ($scope, uiGmapGoogleMapApi, $firebaseObj
 app.controller('CreateCtrl', function ($scope, $firebaseObject) {
   console.log("Create Controller reporting for duty.");
 
-  var ref = firebase.database().ref();
   $scope.uid = "";
 
   $scope.getID = function() {
 
     newUid = (0|Math.random()*9e6).toString(36);
 
-    var newRef = ref.push({
-        uid: newUid,
+    var newRef = firebase.database().ref(newUid).set({
         created: Date.now()
       });
-    $scope.uid = newRef.key;
+    $scope.uid = newUid;
   };
 
   
@@ -208,9 +206,9 @@ app.directive('card', function () {
             ctx.stroke();
             ctx.closePath();
 
-            var x = 20;
+            var x = 50;
             var y = c.height - 50;
-            ctx.font = "15px  Impact";
+            ctx.font = "30px  Impact";
             ctx.textAlign = 'left';
             ctx.fillText("ID:" + scope.uid, x, y);
           };

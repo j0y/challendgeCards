@@ -144,27 +144,24 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
   console.log("Create Controller reporting for duty.");
 
   $scope.uid = "";
-
+  var i = 0;
   $scope.getID = function() {
-    newUid = "450pf";
-    checkID(newUid);
+    newUid = (0|Math.random()*9e6).toString(36);
+    $scope.checkID(newUid);
   };
 
-    checkID = function(newUid) {
+    $scope.checkID = function(newUid) {
       firebase.database().ref().once('value', function(snapshot) {
       if (snapshot.hasChild(newUid)) {
-        console.log("exist");
-        generateNewId();
+        $scope.getID();
       }
       else {
-        console.log("display " + newUid);
-        displayId(newUid);
+        $scope.displayId(newUid);
       }
     });
     }
 
-
-  displayId = function(newUid){
+  $scope.displayId = function(newUid){
     var newRef = firebase.database().ref(newUid).set({
         created: Date.now()
       });
@@ -172,14 +169,6 @@ app.controller('CreateCtrl', function ($scope, $firebaseObject) {
     $scope.$apply();
     $scope.drawCanvas();
   };
-
-  generateNewId = function() {
-    console.log("generator");
-    newUid = (0|Math.random()*9e6).toString(36);
-    checkID(newUid);
-  }
-
-  
 });
 
 app.directive('card', function () {

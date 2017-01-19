@@ -211,7 +211,8 @@ app.directive('card', function () {
             var x = c.width / 2;
             var y = c.height / 3;
             ctx.textAlign = 'center';
-            ctx.fillText(scope.upperText, x, y);
+            //ctx.fillText(scope.upperText, x, y);
+            wrapText(ctx, scope.upperText, x, y, c.width-40, 30);
             //ctx.lineWidth = 2;
             //ctx.strokeText(scope.upperText, x, y);
 
@@ -241,7 +242,51 @@ app.directive('card', function () {
             ctx.font = "30px  Impact";
             ctx.textAlign = 'left';
             ctx.fillText("ID:" + scope.uid, x, y);
+
+            switch (scope.type) {
+              case "good":
+                ctx.fillStyle = "red";
+                break;
+              case "adventure":
+                ctx.fillStyle = "blue";
+                break;
+              case "meet":
+                ctx.fillStyle = "green";
+                break;
+              case "kill":
+                ctx.fillStyle = "black";
+                break;
+              default:
+                ctx.fillStyle = "white";
+            }
+
+            ctx.beginPath();
+            ctx.rect(13, 13, 253, 85);
+            ctx.fill();
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 5;
+            ctx.stroke();
           };
+
+          function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            var words = text.split(' ');
+            var line = '';
+
+            for(var n = 0; n < words.length; n++) {
+              var testLine = line + words[n] + ' ';
+              var metrics = context.measureText(testLine);
+              var testWidth = metrics.width;
+              if (testWidth > maxWidth && n > 0) {
+                context.fillText(line, x, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+              }
+              else {
+                line = testLine;
+              }
+            }
+            context.fillText(line, x, y);
+          }
         }
       }
     });

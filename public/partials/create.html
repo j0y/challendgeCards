@@ -3,17 +3,29 @@
 <div class="container">
 
     <div class="row">
-
-    <textarea type="text" ng-change="drawCanvas()" ng-model="upperText" placeholder="upperText"></textarea>
-    <br>
-    <card id></card>
-    <br>
-    <br>
-
-    <button ng-click="getID(); drawCanvas();" type="submit" class="btn btn-primary">Получить ID</button>
-
-    <h2>{{uid}}</h2>
-
+        <div class="col-md-6">
+        <div>
+        <label>Тип карты:</label>
+        <select ng-model="type" ng-change="drawCanvas()">
+            <option value="">Без категории</option>
+            <option value="good">Добрые дела</option>
+            <option value="adventure">Приключения</option>
+            <option value="meet">Встреча</option>
+            <option value="kill">Побить бомжа</option>
+       </select>
+       </div>
+       <div>
+        <label>Задание:</label>
+        <input type="text" ng-change="drawCanvas()" ng-model="upperText" placeholder=""></input>
+        </div>
+        <button ng-click="getID(); drawCanvas();" type="submit" class="btn btn-primary">Получить ID</button>
+        <br>
+        <h2>{{uid}}</h2>
+        </div>
+        <br>
+        <div class="col-md-6">
+        <card id></card>
+        </div>
     </div>
     <!-- /.row -->
 
